@@ -1,0 +1,286 @@
+{
+  "version": 3,
+  "classes": [
+    {
+      "id": "death-knight",
+      "name": "Death Knight",
+      "description": "A plate fighter who uses frost and bone magic to control the fight.",
+      "icon": 0,
+      "resource": "Runic power",
+      "tree": "gravewarden",
+      "unlocks": [
+        {
+          "level": 1,
+          "ability": "iron-strike"
+        },
+        {
+          "level": 3,
+          "ability": "rime-cleave"
+        },
+        {
+          "level": 6,
+          "ability": "frost-shard"
+        }
+      ],
+      "allowedItemCategories": [
+        "plate",
+        "sword",
+        "axe",
+        "mace",
+        "shield",
+        "off-hand-weapon",
+        "ring"
+      ]
+    }
+  ],
+  "abilities": [
+    {
+      "id": "iron-strike",
+      "name": "Iron Strike",
+      "icon": 1,
+      "description": "A deliberate swing in a forward arc.",
+      "aim": "Facing",
+      "fallback": "Require focus",
+      "shape": "Arc",
+      "activation": "Press",
+      "castMs": 0,
+      "moving": true,
+      "cost": 0,
+      "damage": 0,
+      "weaponPercent": 100,
+      "ranks": [],
+      "chargeTiers": []
+    },
+    {
+      "id": "rime-cleave",
+      "name": "Rime Cleave",
+      "icon": 2,
+      "description": "",
+      "aim": "Facing",
+      "fallback": "Require focus",
+      "shape": "Arc",
+      "activation": "Hold and release",
+      "castMs": 0,
+      "moving": true,
+      "cost": 20,
+      "damage": 0,
+      "weaponPercent": 120,
+      "ranks": [],
+      "chargeTiers": [
+        {
+          "holdMs": 600,
+          "damagePercent": 150
+        },
+        {
+          "holdMs": 1200,
+          "damagePercent": 190
+        }
+      ]
+    },
+    {
+      "id": "frost-shard",
+      "name": "Frost Shard",
+      "icon": 4,
+      "description": "",
+      "aim": "Focused enemy",
+      "fallback": "Closest eligible target",
+      "shape": "Single",
+      "activation": "Press",
+      "castMs": 900,
+      "moving": false,
+      "cost": 12,
+      "damage": 18,
+      "weaponPercent": 0,
+      "ranks": [
+        {
+          "level": 12,
+          "damage": 28
+        },
+        {
+          "level": 18,
+          "damage": 42
+        }
+      ],
+      "chargeTiers": []
+    }
+  ],
+  "trees": [
+    {
+      "id": "gravewarden",
+      "name": "Gravewarden",
+      "description": "A small sample branch that improves Frost Shard.",
+      "nodes": [
+        {
+          "id": "cold-discipline",
+          "name": "Cold Discipline",
+          "cost": 1,
+          "requires": "",
+          "ability": "frost-shard",
+          "moving": -1
+        },
+        {
+          "id": "march-of-rime",
+          "name": "March of Rime",
+          "cost": 2,
+          "requires": "cold-discipline",
+          "ability": "frost-shard",
+          "moving": 1
+        }
+      ]
+    }
+  ],
+  "progression": [
+    {
+      "id": "sample-curve",
+      "name": "Sample curve",
+      "description": "A short progression profile for inspecting class unlocks.",
+      "cap": 20,
+      "firstTalentLevel": 5,
+      "levelsPerPoint": 1,
+      "baseXp": 100,
+      "xpPerLevel": 50
+    }
+  ],
+  "equipmentSlots": [
+    {
+      "id": "main-hand",
+      "name": "Main hand",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "sword",
+        "axe",
+        "mace"
+      ]
+    },
+    {
+      "id": "off-hand",
+      "name": "Off hand",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "shield",
+        "off-hand-weapon"
+      ]
+    },
+    {
+      "id": "head",
+      "name": "Head",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "cloth",
+        "leather",
+        "mail",
+        "plate"
+      ]
+    },
+    {
+      "id": "chest",
+      "name": "Chest",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "cloth",
+        "leather",
+        "mail",
+        "plate"
+      ]
+    },
+    {
+      "id": "legs",
+      "name": "Legs",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "cloth",
+        "leather",
+        "mail",
+        "plate"
+      ]
+    },
+    {
+      "id": "feet",
+      "name": "Feet",
+      "description": "",
+      "count": 1,
+      "itemCategories": [
+        "cloth",
+        "leather",
+        "mail",
+        "plate"
+      ]
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "description": "",
+      "count": 2,
+      "itemCategories": [
+        "ring"
+      ]
+    }
+  ],
+  "itemCategories": [
+    {
+      "id": "cloth",
+      "name": "Cloth",
+      "group": "Armor",
+      "description": ""
+    },
+    {
+      "id": "leather",
+      "name": "Leather",
+      "group": "Armor",
+      "description": ""
+    },
+    {
+      "id": "mail",
+      "name": "Mail",
+      "group": "Armor",
+      "description": ""
+    },
+    {
+      "id": "plate",
+      "name": "Plate",
+      "group": "Armor",
+      "description": ""
+    },
+    {
+      "id": "sword",
+      "name": "Sword",
+      "group": "Weapon",
+      "description": ""
+    },
+    {
+      "id": "axe",
+      "name": "Axe",
+      "group": "Weapon",
+      "description": ""
+    },
+    {
+      "id": "mace",
+      "name": "Mace",
+      "group": "Weapon",
+      "description": ""
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "group": "Off hand",
+      "description": ""
+    },
+    {
+      "id": "off-hand-weapon",
+      "name": "Off-hand weapon",
+      "group": "Weapon",
+      "description": ""
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "group": "Accessory",
+      "description": ""
+    }
+  ]
+}
