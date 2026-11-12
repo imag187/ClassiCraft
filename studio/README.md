@@ -25,3 +25,11 @@ Create an item category with a name and an optional group, such as Crystal in th
 Extract the Windows x64 ZIP to a folder you can write to, then open ClassiCraftStudio.exe. Keep example.json and the assets folder beside the executable. Save changes writes library.json in the same folder. Copy library.json with the app to continue the same content library on another PC.
 
 The portable build includes the Visual C++ runtime. Install the development toolchain only to rebuild or change the C++ editor.
+
+## World tools prototype
+
+Choose **World tools** at the top of Studio. The world project is separate from the content library and is saved as `world-project.json` next to the executable. Use **Save world** to persist it; copy that file to back up or transfer the project. Reload is disabled while there are unsaved changes.
+
+The starter test world includes a 20 by 20 grass map, grass/snow/path tiles, a player spawn, a training dummy, and a test wall. The tile editor paints 16 by 8 RGBA pixels (left click paints, right click erases). The map editor creates maps up to 64 by 64 cells, places tiles in an isometric view, and stores an explicit z-layer and collision flag per cell. The world editor places map references and records object positions and collision flags. Positions can be entered numerically or set on its isometric canvas.
+
+This is authoring data only: there is no sprite editor, server export, collision simulation, or playable game client yet. World objects are shown as markers. The JSON schema is an early prototype and may change; preserve backups of authored projects.

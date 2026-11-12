@@ -5,7 +5,7 @@ FetchContent_Declare(imgui GIT_REPOSITORY https://github.com/ocornut/imgui.git G
 FetchContent_Declare(json GIT_REPOSITORY https://github.com/nlohmann/json.git GIT_TAG v3.11.3 GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(imgui json)
 
-add_executable(ClassiCraftStudio WIN32 main.cpp editor.cpp
+add_executable(ClassiCraftStudio WIN32 main.cpp editor.cpp world_editor.cpp
     ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui_draw.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp

@@ -12,6 +12,7 @@
 
 using Json = nlohmann::json;
 namespace fs = std::filesystem;
+void DrawWorldEditor(const fs::path& directory);
 namespace {
 constexpr std::array kinds{"classes", "abilities", "trees", "progression", "equipmentSlots", "itemCategories"};
 constexpr int equipmentKind = 4;
@@ -538,6 +539,14 @@ void DrawEditor(const fs::path& directory, ImTextureID atlas) {
     ImGui::SetNextWindowSize(viewport->Size);
     ImGui::Begin("ClassiCraft Studio", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
     ImGui::TextColored({0.95f, .76f, .44f, 1}, "CLASSICRAFT STUDIO");
+    static bool worldMode = false;
+    ImGui::SameLine();
+    if (ImGui::Button(worldMode ? "Content library" : "World tools")) worldMode = !worldMode;
+    if (worldMode) {
+        DrawWorldEditor(directory);
+        ImGui::End();
+        return;
+    }
     ImGui::SameLine();
     if (ImGui::Button("Save library")) {
         SaveLibrary(library);
