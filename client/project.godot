@@ -11,13 +11,24 @@ config_version=5
 [application]
 
 config/name="ClassiCraft"
-run/main_scene="uid://p6uxc2gbm4vl"
-config/features=PackedStringArray("4.4", "Forward Plus")
+run/main_scene="res://scenes/test-scene.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
 NetWS="*res://NetWS.gd"
+
+[display]
+
+window/size/viewport_width=568
+window/size/viewport_height=626
+window/stretch/mode="canvas_items"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.07, 0.08, 0.1, 1)
 
 [editor_plugins]
 

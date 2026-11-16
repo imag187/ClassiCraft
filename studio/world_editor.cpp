@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "imgui.h"
 #include "imgui_stdlib.h"
 #include <nlohmann/json.hpp>
@@ -72,7 +73,7 @@ void Load(const fs::path& path) {
         world.at("name").get<std::string>();
         if (!world.at("maps").is_array() || !world.at("objects").is_array()) throw std::runtime_error("Invalid world.");
         for (const auto& m : world.at("maps")) { m.at("map").get<std::string>(); m.at("x").get<int>(); m.at("y").get<int>(); m.at("z").get<int>(); }
-        for (const auto& o : world.at("objects")) { o.at("name").get<std::string>(); o.at("kind").get<std::string>(); o.at("x").get<int>(); o.at("y").get<int>(); o.at("z").get<int>(); o.at("collision").get<bool>(); }
+        for (const auto& o : world.at("objects")) { o.at("name").get<std::string>(); o.at("kind").get<std::string>(); o.at("x").get<int>(); o.at("y").get<int>(); o.at("z").get<int>(); o.at("collision").get<bool>(); if (o.contains("artwork")) o.at("artwork").get<std::string>(); }
         project = std::move(next); tileIndex = mapIndex = 0; dirty = false; loadFailed = false;
         message = "World project loaded.";
     } catch (const std::exception& e) { loadFailed = true; message = std::string("Load failed; save disabled: ") + e.what(); }
@@ -222,7 +223,7 @@ void WorldEditor() {
     auto& world = project["world"]; auto& maps = project["maps"];
     static int placingObject = -1, placingMap = -1;
     if (ImGui::InputText("World name", &world["name"].get_ref<std::string&>())) dirty = true;
-    ImGui::TextWrapped("Place maps in world coordinates. Add spawns, enemies, and objects with positions and collision flags.");
+    ImGui::TextWrapped("Place maps in world coordinates. Add spawns, enemies, and objects with positions and collision flags. Use kind item for a pickup.");
     if (!maps.empty() && ImGui::Button("Add selected map")) {
         mapIndex = std::clamp(mapIndex, 0, static_cast<int>(maps.size()) - 1);
         world["maps"].push_back({{"map", maps[mapIndex]["id"]}, {"x", 0}, {"y", 0}, {"z", 0}}); dirty = true;
@@ -248,6 +249,23 @@ void WorldEditor() {
         auto& o = world["objects"][i]; ImGui::PushID(10000 + i);
         if (ImGui::InputText("Name", &o["name"].get_ref<std::string&>())) dirty = true;
         if (ImGui::InputText("Kind", &o["kind"].get_ref<std::string&>())) dirty = true;
+        const std::string artwork = o.value("artwork", "");
+        if (ImGui::BeginCombo("Artwork", artwork.empty() ? "Default marker" : artwork.c_str())) {
+            if (ImGui::Selectable("Default marker", artwork.empty()) && !artwork.empty()) {
+                o.erase("artwork");
+                dirty = true;
+            }
+            for (const auto& tile : project["tiles"]) {
+                const auto& id = tile["id"].get_ref<const std::string&>();
+                ImGui::PushID(id.c_str());
+                if (ImGui::Selectable(tile["name"].get_ref<const std::string&>().c_str(), artwork == id) && artwork != id) {
+                    o["artwork"] = id;
+                    dirty = true;
+                }
+                ImGui::PopID();
+            }
+            ImGui::EndCombo();
+        }
         for (const char* key : {"x", "y", "z"}) { int v = o[key]; ImGui::SetNextItemWidth(70); if (ImGui::InputInt(key, &v, 0, 0)) { o[key] = v; dirty = true; } ImGui::SameLine(); }
         ImGui::NewLine();
         bool collision = o["collision"]; if (ImGui::Checkbox("Collision", &collision)) { o["collision"] = collision; dirty = true; }
@@ -285,7 +303,11 @@ void WorldEditor() {
     for (const auto& object : world["objects"]) {
         int x = object["x"], y = object["y"], z = object["z"];
         ImVec2 p{ox + (x - y) * tw / 2, oy + (x + y) * th / 2 + th / 2 - z * 2};
-        draw->AddCircleFilled(p, 5.f, object["collision"].get<bool>() ? IM_COL32(255, 115, 100, 255) : IM_COL32(120, 200, 255, 255));
+        const auto artwork = object.value("artwork", "");
+        const auto& tiles = project["tiles"];
+        const auto art = std::find_if(tiles.begin(), tiles.end(), [&](const Json& tile) { return tile["id"] == artwork; });
+        if (art != tiles.end()) TilePicture(draw, {p.x - W / 2.f, p.y - H / 2.f}, 1.f, *art);
+        else draw->AddCircleFilled(p, 5.f, object["collision"].get<bool>() ? IM_COL32(255, 115, 100, 255) : IM_COL32(120, 200, 255, 255));
         draw->AddText({p.x + 6, p.y - 8}, IM_COL32_WHITE, object["name"].get_ref<const std::string&>().c_str());
     }
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1)) { placingMap = placingObject = -1; }
@@ -302,7 +324,14 @@ void WorldEditor() {
 }
 
 void DrawWorldEditor(const fs::path& directory) {
-    const auto path = directory / "world-project.json";
+    static const auto path = [&directory] {
+        wchar_t* configured = nullptr;
+        size_t length = 0;
+        _wdupenv_s(&configured, &length, L"CLASSICRAFT_WORLD_PATH");
+        const auto result = configured && length > 1 ? fs::path(configured) : directory / "world-project.json";
+        std::free(configured);
+        return result;
+    }();
     if (!initialized) { project = DefaultProject(); initialized = true; if (fs::exists(path)) Load(path); }
     ImGui::SameLine();
     ImGui::BeginDisabled(loadFailed);

@@ -1,3 +1,4 @@
 **/build/
 **/assets/
 client/.godot/
+/imgui.ini

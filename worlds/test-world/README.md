@@ -1,7 +1,9 @@
-# ClassiCraft test world
+# The Borderlands
 
-This is the editable starter world for the Studio prototype. It contains a test map, three simple tiles, a player spawn, a training dummy, and a wall. Keep it under version control so it can move between development machines.
+A 56 × 44 isometric playtest world with a training area, woodland, highland, and ruins. The Studio project includes brick, oak and pine planks, trees, berry bushes, and granite rock artwork. Materials and biome variants are authoring data for future gameplay.
 
-Studio currently reads and saves `world-project.json` next to its executable. To use this tracked world, close Studio and copy this directory's `world-project.json` beside the Studio executable, preserving a backup of any existing file there first. Open Studio and choose **World tools**. After editing, choose **Save world**, close Studio, and copy the saved file back here. Review the diff and commit it along with any changes you want to share. These are separate copies; saving in Studio does not automatically update this repository.
+Use Studio’s **Tile editor** to paint 16 × 8 pixel artwork. In **World editor**, assign it through an object's **Artwork** field. An object with kind `item` and collision disabled can be picked up in the native client. See the [root README](../../README.md) for opening this file directly in Studio and running the game.
 
-Do not commit private world projects or assets without their owners' permission. This is an early prototype; gameplay, sprite assets and a C++ server are not implemented in this file.
+Studio Z layers raise artwork in the native client. A raised tile with collision checked draws solid side faces. Player movement, targeting, and pickups use the ground plane; upper layers can supply scenery and occlusion. Partially transparent pixels keep their alpha in the game.
+
+To rebuild the generated playtest layout, run `node worlds/test-world/build-world.mjs` from the checkout root. The generator replaces the map layout, generated tiles, and placed scenery, so save any manual variants to a separate world file first.

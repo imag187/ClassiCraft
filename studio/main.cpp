@@ -10,7 +10,16 @@
 
 using Microsoft::WRL::ComPtr;
 namespace fs = std::filesystem;
+#ifdef CLASSICRAFT_GAME
+void DrawGame(HWND window);
+void ShutdownGame();
+constexpr auto appName = L"ClassiCraft";
+constexpr auto windowClass = L"ClassiCraftGame";
+#else
 void DrawEditor(const fs::path& directory, ImTextureID atlas);
+constexpr auto appName = L"ClassiCraft Studio";
+constexpr auto windowClass = L"ClassiCraftStudio";
+#endif
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
 static UINT width, height;
 
@@ -27,6 +36,7 @@ static LRESULT CALLBACK HandleMessage(HWND window, UINT message, WPARAM w, LPARA
     return DefWindowProcW(window, message, w, l);
 }
 
+#ifndef CLASSICRAFT_GAME
 static ComPtr<ID3D11ShaderResourceView> LoadAtlas(ID3D11Device* device, const fs::path& path) {
     ComPtr<IWICImagingFactory> factory;
     ComPtr<IWICBitmapDecoder> decoder;
@@ -58,11 +68,13 @@ static ComPtr<ID3D11ShaderResourceView> LoadAtlas(ID3D11Device* device, const fs
     return view;
 }
 
+#endif
+
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     const WNDCLASSW wc{CS_HREDRAW | CS_VREDRAW, HandleMessage, 0, 0, instance,
-        nullptr, LoadCursor(nullptr, IDC_ARROW), nullptr, nullptr, L"ClassiCraftStudio"};
+        nullptr, LoadCursor(nullptr, IDC_ARROW), nullptr, nullptr, windowClass};
     RegisterClassW(&wc);
-    HWND window = CreateWindowW(wc.lpszClassName, L"ClassiCraft Studio", WS_OVERLAPPEDWINDOW,
+    HWND window = CreateWindowW(wc.lpszClassName, appName, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 1280, 800, nullptr, nullptr, instance, nullptr);
     if (!window) return 1;
 
@@ -82,19 +94,25 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
             D3D11_SDK_VERSION, &swapDesc, &swap, &device, nullptr, &context))) break;
     }
     if (!swap) {
-        MessageBoxW(window, L"Direct3D 11 initialization failed.", L"ClassiCraft Studio", MB_ICONERROR);
+        MessageBoxW(window, L"Direct3D 11 initialization failed.", appName, MB_ICONERROR);
         DestroyWindow(window);
         return 1;
     }
 
+#ifndef CLASSICRAFT_GAME
     wchar_t executable[32768];
     GetModuleFileNameW(nullptr, executable, ARRAYSIZE(executable));
     const auto directory = fs::path(executable).parent_path();
     const HRESULT com = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     auto atlas = LoadAtlas(device.Get(), directory / "assets" / "prototype-icons.png");
 
+#endif
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+#ifdef CLASSICRAFT_GAME
+    ImGui::GetIO().IniFilename = nullptr;
+#endif
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     ImGui::StyleColorsDark();
     ImGui::GetStyle().WindowPadding = {16, 14};
@@ -130,7 +148,11 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+#ifdef CLASSICRAFT_GAME
+        DrawGame(window);
+#else
         DrawEditor(directory, reinterpret_cast<ImTextureID>(atlas.Get()));
+#endif
         ImGui::Render();
         const float background[]{0.055f, 0.07f, 0.10f, 1};
         context->OMSetRenderTargets(1, target.GetAddressOf(), nullptr);
@@ -141,8 +163,12 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int) {
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+#ifdef CLASSICRAFT_GAME
+    ShutdownGame();
+#else
     atlas.Reset();
     if (SUCCEEDED(com)) CoUninitialize();
+#endif
     if (IsWindow(window)) DestroyWindow(window);
     return 0;
 }
